@@ -179,12 +179,12 @@ int connect_to_filesystem() {
 	return response;
 }
 
-void signal_handler(){
-	pid_t pid;
-	int status;
-	pid = waitpid(-1,&status,WNOHANG);
-	log_inform("proceso hijo de pid: %d",pid);
-}
+//void signal_handler(){
+//	pid_t pid;
+//	int status;
+//	pid = waitpid(-1,&status,WNOHANG);
+//	log_inform("proceso hijo de pid: %d",pid);
+//}
 void listen_to_master() {
 	log_print("Escuchando puertos");
 	socketEscuchaMaster = socket_init(NULL, config_get("PUERTO_WORKER"));
@@ -303,7 +303,6 @@ int status;
 				}
 			} else if (pid > 0) {
 				log_print("PROCESO_PADRE:%d", pid);
-				//waitpid(pid,&status,WNOHANG);
 			} else if (pid < 0) {
 				log_report("NO SE PUDO HACER EL FORK");
 			}
