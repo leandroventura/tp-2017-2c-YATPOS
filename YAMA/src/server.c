@@ -285,16 +285,19 @@ void enviarEtapa_transformacion_Master(int job, int tamaniolistaNodos,t_workerPl
 
 bool verificoFinalizacionTransformacion(char* nodo,int socket,int job){
 	bool esNodoBuscado(void* estadoTarea){
-		  	return string_equals_ignore_case(((t_Estado *) estadoTarea)->nodo,nodo) && ((t_Estado *) estadoTarea)->master == socket && !string_equals_ignore_case(((t_Estado *) estadoTarea)->estado, "Error") && ((t_Estado *) estadoTarea)->job == job;
+		printf("comparacion \n");
+		return string_equals_ignore_case(((t_Estado *) estadoTarea)->nodo,nodo) && ((t_Estado *) estadoTarea)->master == socket && !string_equals_ignore_case(((t_Estado *) estadoTarea)->estado, "Error") && ((t_Estado *) estadoTarea)->job == job;
 	}
 
 	mlist_t* listaFiltradaDelNodo = mlist_filter(listaEstados, (void*)esNodoBuscado);
-
+	printf("filtre la lista \n");
 	bool FinalizacionDeTransf_Nodo(void* estadoTarea){
 			  	return string_equals_ignore_case(((t_Estado *) estadoTarea)->estado,"FinalizadoOK");
 	}
-
-	return mlist_all(listaFiltradaDelNodo, (void*) FinalizacionDeTransf_Nodo);
+	printf("termine de comparar \n");
+	bool terminarontodos = mlist_all(listaFiltradaDelNodo, (void*) FinalizacionDeTransf_Nodo);
+	mlist_destroy(listaFiltradaDelNodo,NULL);
+	return terminarontodos;
 
 }
 

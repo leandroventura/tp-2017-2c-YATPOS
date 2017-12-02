@@ -189,9 +189,7 @@ void listen_to_master() {
 	log_print("Escuchando puertos");
 	socketEscuchaMaster = socket_init(NULL, config_get("PUERTO_WORKER"));
 	t_socket socketAceptado;
-int status;
 
-//	pthread_mutex_t  mutex = PTHREAD_MUTEXT_I
 	while (true) {
 		pid_t pid;
 		socketAceptado = socket_accept(socketEscuchaMaster);
