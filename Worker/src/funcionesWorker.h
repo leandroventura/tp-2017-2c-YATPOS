@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <string.h>
+#include <pthread.h>
 
 #include <sys/select.h>
 #include <sys/types.h>

@@ -135,9 +135,10 @@ char * crearListaParaReducir(tEtapaReduccionGlobalWorker * rg) {
 				serial_unpack(paquete.content, "si", &bufferArchivoTemporal, &size);
 				t_file * archivo = crearArchivo(bufferArchivoTemporal, size,
 						rg->rg->archivo_temporal_de_rl);
-				mlist_append(archivosAReducir, (char *) file_path(archivo));
+				mlist_append(archivosAReducir, (char *)file_path(archivo));
 
 			}else{
+				log_print("SOY ENCARGADO para generar el archivo: %s",rg->archivoEtapa);
 				char * aux = mstring_create("%s%s",system_userdir(),rg->rg->archivo_temporal_de_rl);
 				mlist_append(archivosAReducir, aux);
 			}
@@ -182,8 +183,7 @@ void listen_to_master() {
 	log_print("Escuchando puertos");
 	socketEscuchaMaster = socket_init(NULL, config_get("PUERTO_WORKER"));
 	t_socket socketAceptado;
-	int status;
-
+//	pthread_mutex_t  mutex = PTHREAD_MUTEXT_I
 	while (true) {
 		pid_t pid;
 		socketAceptado = socket_accept(socketEscuchaMaster);
@@ -310,6 +310,7 @@ void listen_to_master() {
 				case (OP_MANDAR_ARCHIVO): //OP_MANDAR_ARCHIVO
 					serial_unpack(paquete.content, "s", &nombreDelArchivo);
 					char * aux2 = mstring_create("%s%s",system_userdir(),nombreDelArchivo);
+					log_print("NOMBRE DEL ARCHIVO A MANDAR A ENCARGADO: %s",nombreDelArchivo);
 					archivo = file_open(aux2);
 					bufferArchivo = file_map(archivo);
 					paquete.content = serial_pack("si", bufferArchivo, file_size(archivo));
@@ -344,6 +345,7 @@ bool block_transform(int blockno, size_t size, const char *script, const char *o
 	char *outpath = path_create(PTYPE_YATPOS, output);
 	//char *command = mstring_create("cat %s | tail -c %zi | head -c %zi | %s | sort > %s", datapath, start, size, scrpath, outpath);
 	char * command; int offset;
+	log_print("Transformo en el BLOQUE: %d, la cantidad de: %d bytes\n",bytesOcupados,blockno);
 	if (blockno == 0) {
 		offset = bytesOcupados;
 		command = mstring_create("head -c %d < %s | %s | sort > %s%s",
