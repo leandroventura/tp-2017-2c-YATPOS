@@ -134,6 +134,7 @@ bool thread_killed(thread_t *thread) {
 }
 
 bool thread_active() {
+	if(threads == NULL) return true;
 	return !thread_killed(thread_self());
 }
 

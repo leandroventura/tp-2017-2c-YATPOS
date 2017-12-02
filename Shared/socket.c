@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mstring.h>
+#include <thread.h>
 
 #define BACKLOG 5
 #define MAXSIZE 1024
@@ -193,7 +194,10 @@ static size_t sendall(t_socket sockfd, const void *buf, size_t len) {
 	size_t bytes_sent = 0;
 
 	while(bytes_sent < len) {
-		ssize_t n = send(sockfd, buf + bytes_sent, len - bytes_sent, MSG_NOSIGNAL);
+		ssize_t n;
+		do {
+			n = send(sockfd, buf + bytes_sent, len - bytes_sent, MSG_NOSIGNAL);
+		} while(n == -1 && errno == EINTR && thread_active());
 		if(n == -1 && errno == EPIPE) break;
 		check_descriptor(n);
 		bytes_sent += n;
@@ -206,7 +210,10 @@ static size_t recvall(t_socket sockfd, void *buf, size_t len) {
 	size_t bytes_received = 0;
 
 	while(bytes_received < len) {
-		ssize_t n = recv(sockfd, buf + bytes_received, len - bytes_received, 0);
+		ssize_t n;
+		do {
+			n = recv(sockfd, buf + bytes_received, len - bytes_received, 0);
+		} while(n == -1 && errno == EINTR && thread_active());
 		if(n == -1) return 0;
 		bytes_received += n;
 		if(n == 0 || (len == MAXSIZE && ((char*)buf)[bytes_received - 1] == '\0')) {
