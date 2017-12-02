@@ -190,7 +190,7 @@ void listen_to_master() {
 	socketEscuchaMaster = socket_init(NULL, config_get("PUERTO_WORKER"));
 	t_socket socketAceptado;
 int status;
-signal(SIGCHLD,signal_handler);
+
 //	pthread_mutex_t  mutex = PTHREAD_MUTEXT_I
 	while (true) {
 		pid_t pid;
@@ -303,7 +303,7 @@ signal(SIGCHLD,signal_handler);
 				}
 			} else if (pid > 0) {
 				log_print("PROCESO_PADRE:%d", pid);
-				waitpid(pid,&status,WNOHANG);
+				//waitpid(pid,&status,WNOHANG);
 			} else if (pid < 0) {
 				log_report("NO SE PUDO HACER EL FORK");
 			}

@@ -81,7 +81,7 @@ typedef struct {
 
 t_socket socketEscuchaMaster,socketEscuchaWorker, socketFileSystem,socketWorker;
 
-
+void signal_handler();
 void listen_to_master();
 t_file* crearScript(char * bufferScript,int,int);
 tEtapaReduccionLocalWorker * etapa_rl_unpack_bis(t_serial * serial);
