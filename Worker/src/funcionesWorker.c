@@ -179,11 +179,18 @@ int connect_to_filesystem() {
 	return response;
 }
 
+void signal_handler(){
+	pid_t pid;
+	int status;
+	pid = waitpid(-1,&status,WNOHANG);
+	log_inform("proceso hijo de pid: %d",pid);
+}
 void listen_to_master() {
 	log_print("Escuchando puertos");
 	socketEscuchaMaster = socket_init(NULL, config_get("PUERTO_WORKER"));
 	t_socket socketAceptado;
 int status;
+signal(SIGCHLD,signal_handler);
 //	pthread_mutex_t  mutex = PTHREAD_MUTEXT_I
 	while (true) {
 		pid_t pid;
@@ -249,6 +256,7 @@ int status;
 					tEtapaReduccionGlobalWorker * rg;
 					rg = rg_unpack(packet.content);
 					t_file *scriptReduccionGlobal;
+					break;
 					scriptReduccionGlobal = crearScript(rg->scriptReduccion,
 							OP_INICIAR_REDUCCION_GLOBAL,socketAceptado);
 					archivoAReducir = crearListaParaReducir(rg);
