@@ -183,6 +183,7 @@ void listen_to_master() {
 	log_print("Escuchando puertos");
 	socketEscuchaMaster = socket_init(NULL, config_get("PUERTO_WORKER"));
 	t_socket socketAceptado;
+int status;
 //	pthread_mutex_t  mutex = PTHREAD_MUTEXT_I
 	while (true) {
 		pid_t pid;
@@ -216,7 +217,7 @@ void listen_to_master() {
 					path_remove(file_path(scriptTransformacion));
 					//serial_destroy(packet.content); //agrego esto
 					free(bufferScript); //lo movi, originalmente estaba en linea 208
-					exit(0);
+					exit(1);
 					break;
 				case OP_INICIAR_REDUCCION_LOCAL:
 					log_print("OP_INICIAR_REDUCCION_LOCAL");
@@ -294,6 +295,7 @@ void listen_to_master() {
 				}
 			} else if (pid > 0) {
 				log_print("PROCESO_PADRE:%d", pid);
+				waitpid(pid,&status,WNOHANG);
 			} else if (pid < 0) {
 				log_report("NO SE PUDO HACER EL FORK");
 			}
