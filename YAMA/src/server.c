@@ -116,16 +116,22 @@ void listen_to_master() {
 						entreAPlanificar = false;
 					}
 					else{
-						log_inform("Transformacion terminada para :%d bloque: %d",finalizoOperacion->idJOB,finalizoOperacion->bloque);
-						actualizoTablaEstado(finalizoOperacion->nodo,finalizoOperacion->bloque,sock,finalizoOperacion->idJOB,"FinalizadoOK");
-						if(verificoFinalizacionTransformacion(finalizoOperacion->nodo,sock,finalizoOperacion->idJOB)){
-							t_infoNodo* IP_PUERTOnodo = BuscoIP_PUERTO(finalizoOperacion->nodo);
-							mlist_t* archivosTemporales_Transf = BuscoArchivosTemporales(finalizoOperacion->nodo,sock,finalizoOperacion->idJOB);
-							char* temporal_local = generarNombreTemporal_local(finalizoOperacion->nodo,sock,finalizoOperacion->idJOB);
-							mandarEtapaReduccionLocal(finalizoOperacion->idJOB,sock,finalizoOperacion->nodo,IP_PUERTOnodo,archivosTemporales_Transf,temporal_local);
+						if(finalizoOperacion->bloque == 4608){
+							log_report("Recibido bloque corrupto, se aborta el Job: %d", finalizoOperacion->idJOB);
+							abortarJob(finalizoOperacion->idJOB, sock, ERROR_PLANIFICACION);
+						}
+						else{
+							log_inform("Transformacion terminada para :%d bloque: %d",finalizoOperacion->idJOB,finalizoOperacion->bloque);
+							actualizoTablaEstado(finalizoOperacion->nodo,finalizoOperacion->bloque,sock,finalizoOperacion->idJOB,"FinalizadoOK");
+							if(verificoFinalizacionTransformacion(finalizoOperacion->nodo,sock,finalizoOperacion->idJOB)){
+								t_infoNodo* IP_PUERTOnodo = BuscoIP_PUERTO(finalizoOperacion->nodo);
+								mlist_t* archivosTemporales_Transf = BuscoArchivosTemporales(finalizoOperacion->nodo,sock,finalizoOperacion->idJOB);
+								char* temporal_local = generarNombreTemporal_local(finalizoOperacion->nodo,sock,finalizoOperacion->idJOB);
+								mandarEtapaReduccionLocal(finalizoOperacion->idJOB,sock,finalizoOperacion->nodo,IP_PUERTOnodo,archivosTemporales_Transf,temporal_local);
+							}
 						}
 					}
-					}
+				}
 				break;
 				case OP_REDUCCION_LOCAL_LISTA:
 					{respuestaOperacion* finalizoRL = serial_unpackrespuestaOperacion(packetOperacion.content);
@@ -285,16 +291,13 @@ void enviarEtapa_transformacion_Master(int job, int tamaniolistaNodos,t_workerPl
 
 bool verificoFinalizacionTransformacion(char* nodo,int socket,int job){
 	bool esNodoBuscado(void* estadoTarea){
-		printf("comparacion \n");
 		return string_equals_ignore_case(((t_Estado *) estadoTarea)->nodo,nodo) && ((t_Estado *) estadoTarea)->master == socket && !string_equals_ignore_case(((t_Estado *) estadoTarea)->estado, "Error") && ((t_Estado *) estadoTarea)->job == job;
 	}
 
 	mlist_t* listaFiltradaDelNodo = mlist_filter(listaEstados, (void*)esNodoBuscado);
-	printf("filtre la lista \n");
 	bool FinalizacionDeTransf_Nodo(void* estadoTarea){
 			  	return string_equals_ignore_case(((t_Estado *) estadoTarea)->estado,"FinalizadoOK");
 	}
-	printf("termine de comparar \n");
 	bool terminarontodos = mlist_all(listaFiltradaDelNodo, (void*) FinalizacionDeTransf_Nodo);
 	mlist_destroy(listaFiltradaDelNodo,NULL);
 	return terminarontodos;
