@@ -517,8 +517,13 @@ static bool add_blocks_from_file(t_yfile *yfile, const char *path) {
 	int numblocks = count_file_blocks(source, yfile);
 	int freeblocks = nodelist_freeblocks();
 
+	bsent.th = thread_self();
+	bsent.current = 0;
+	bsent.total = number_min(freeblocks, 2 * numblocks);
+
 	if(freeblocks < numblocks) {
-		fprintf(stderr, "Error: no hay suficiente espacio libre para guardar este archivo.\n");
+		if(bsent.th == thread_main())
+			fprintf(stderr, "Error: no hay suficiente espacio libre para guardar este archivo.\n");
 		file_close(source);
 		return false;
 	}
@@ -535,17 +540,17 @@ static bool add_blocks_from_file(t_yfile *yfile, const char *path) {
 		saved_blocks += nodelist_addblock(block, tmap + block->index * BLOCK_SIZE) ? 1 : 0;
 	}
 
-	bsent.th = thread_self();
-	bsent.current = 0;
-	bsent.total = number_min(freeblocks, 2 * numblocks);
-
 	mlist_traverse(yfile->blocks, send_block);
 	mlist_traverse(yfile->blocks, send_block);
 
 	thread_suspend();
 
 	bool success = saved_blocks == bsent.total && numblocks <= saved_blocks && saved_blocks <= 2 * numblocks;
-	if(!success) fprintf(stderr, "Error: no se pudo guardar el archivo.\n");
+	log_inform("%s", success ? "Archivo distribuido correctamente" : "Error al distribuir archivo");
+
+	if(!success && bsent.th == thread_main()) {
+		fprintf(stderr, "Error: no se pudo guardar el archivo.\n");
+	}
 
 	file_unmap(target, tmap);
 	file_delete(target);

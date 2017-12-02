@@ -455,7 +455,6 @@ void actualizarCargaDelNodo(char* nodoCopia, int job, int aumentarOQuitar, int c
 	else{
 		cargaNodoCopia->cargaActual += cantidadAAumentar;
 		cargaNodoCopia->cargaHistorica += cantidadAAumentar;
-		printf("La carga actual del Nodo: %s, es: %d \n", cargaNodoCopia->nodo, cargaNodoCopia->cargaActual);
 		if(posicionCargaJobObtenidoCopia != -1){
 			void * cargaJobObtenida = mlist_get(cargaNodoCopia->cargaPorJob, posicionCargaJobObtenidoCopia);
 			t_cargaPorJob * cargaJobCopia = (t_cargaPorJob *) cargaJobObtenida;

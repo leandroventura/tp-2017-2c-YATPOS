@@ -22,6 +22,8 @@ void finalizar_manejador_transf(int response, t_socket socket,
 	actualizar_hilo(response);
 	pthread_mutex_unlock(&mutex_hilos);
 
+	log_print("Se manda bloque %d\n", transformacion->bloque);
+
 	t_serial *serial_yama = serial_pack("isiis",
 			IDJOB,
 			transformacion->nodo,
