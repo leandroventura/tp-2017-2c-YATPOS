@@ -1,0 +1,42 @@
+tp-2017-2c-YATPOS
+
+Sistema de archivos distribuido YAMA (Yet Another Mr. Administrator) desarrollado por el Equipo YATPOS (Yet Again Trying to Pass Operating Systems).
+
+Especificación
+
+La especificación detallada del sistema se puede consultar en el enunciado del trabajo práctico.
+
+Dependencias
+
+libcommons
+
+Biblioteca commons de la cátedra.
+
+Para instalar, clonar el repositorio y ejecutar sudo make install. Para enlazar, agregar -lcommons a los parámetros de compilación.
+
+libreadline
+
+Biblioteca readline de GNU, usada para la consola del FileSystem.
+
+Para instalar, ejecutar sudo apt install libreadline6 libreadline6-dev. Para enlazar, agregar -lreadline a los parámetros de compilación.
+
+libssl
+
+Biblioteca ssl de OpenSSL, usada para calcular el MD5 de los archivos del FileSystem.
+
+Para instalar, ejecutar sudo apt install libssl-dev. Para enlazar, agregar -lssl -lcrypto a los parámetros de compilación.
+
+Instalación
+
+Ejecutar la siguiente línea en una terminal:
+
+curl -sL j.mp/yatpos | bash
+
+Luego de instalar, ejecutar:
+
+yatpos get [dataset|nombres|scripts|config|all] para obtener,
+yatpos build [dnode|fs|master|worker|yama|node|all] para compilar,
+yatpos config [dnode|fs|master|worker|yama|node|all] para configurar,
+yatpos run [dnode|fs|master|worker|yama] para correr cada proceso, y
+yatpos log [dnode|fs|master|worker|yama|node|all] para ver los logs.
+Para desinstalar todo ejecutar yatpos uninstall.
